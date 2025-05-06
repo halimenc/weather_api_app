@@ -2,23 +2,27 @@ import sys
 import requests
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout)
 from PyQt5.QtCore import Qt
+#first install PyQt5 
 
+# Define the main WeatherApp class inheriting from QWidget
 class WeatherApp(QWidget):
     def __init__(self):
         super().__init__()
+        # Create UI components
         self.city_label= QLabel("Enter a city name: ", self)
         self.city_input= QLineEdit(self)
         self.get_weather_button= QPushButton("Get Weather ",self)
         self.temp_label= QLabel(self)
         self.emoji_label= QLabel(self)
         self.description_label= QLabel(self)
-        self.initUI()
+        self.initUI()  # Initialize the UI layout and styles
 
     def initUI(self):
-        self.setWindowTitle("Weather App")
+        self.setWindowTitle("Weather App") # Set window title
 
-        vbox = QVBoxLayout()
+        vbox = QVBoxLayout() # Use vertical box layout
 
+        # Add widgets to the layout
         vbox.addWidget(self.city_label)
         vbox.addWidget(self.city_input)
         vbox.addWidget(self.get_weather_button)
@@ -26,14 +30,16 @@ class WeatherApp(QWidget):
         vbox.addWidget(self.emoji_label)
         vbox.addWidget(self.description_label)
 
-        self.setLayout(vbox)
+        self.setLayout(vbox) # Apply layout to the main window
 
+        # Center align the widgets
         self.city_label.setAlignment(Qt.AlignCenter)
         self.city_input.setAlignment(Qt.AlignCenter)
         self.temp_label.setAlignment(Qt.AlignCenter)
         self.emoji_label.setAlignment(Qt.AlignCenter)
         self.description_label.setAlignment(Qt.AlignCenter)
 
+        # Assign object names for styling
         self.city_label.setObjectName("city_label")
         self.city_input.setObjectName("city_input")
         self.get_weather_button.setObjectName("get_weather_button")
@@ -41,6 +47,7 @@ class WeatherApp(QWidget):
         self.emoji_label.setObjectName("emoji_label")
         self.description_label.setObjectName("description_label")
 
+        # Define style sheet for widgets
         self.setStyleSheet("""
             QLabel, QPushButton{
                 font-family: calibri;
@@ -74,8 +81,10 @@ class WeatherApp(QWidget):
             }   
         """ )
 
+        # Connect button click to weather function
         self.get_weather_button.clicked.connect(self.get_weather)
 
+    # Function to fetch weather data from API
     def get_weather(self):
         api_key="551d2641dada89a61d7027297ba54518"
         city=self.city_input.text()
@@ -88,7 +97,8 @@ class WeatherApp(QWidget):
 
             if data["cod"]==200:
                 self.display_weather(data)
-
+ 
+        # Handle various HTTP errors
         except requests.exceptions.HTTPError as http_error:
             match response.status_code:
                 case 400:
@@ -121,7 +131,8 @@ class WeatherApp(QWidget):
 
         except requests.exceptions.RequestException as req_error:
             self.display_error(f"Request Error\n{req_error}")
-                        
+
+     # Show error message on the UI                   
     def display_error(self, message):
         self.temp_label.setStyleSheet("font-size: 30px;")
         self.temp_label.setText(message)
@@ -137,11 +148,12 @@ class WeatherApp(QWidget):
         weather_id= data["weather"][0]["id"]
         weather_description=data["weather"][0]["description"]
 
-
+        # Set temperature, emoji, and description on UI
         self.temp_label.setText(f"{temperature_c:.0f}°C")
         self.emoji_label.setText(self.get_weather_emoji(weather_id))
         self.description_label.setText(weather_description)
 
+    # Static method to return emoji based on weather ID
     @staticmethod
     def get_weather_emoji(weather_id):
 
@@ -168,9 +180,7 @@ class WeatherApp(QWidget):
         else:
             return "🦊"
 
-
-
-
+# Entry point of the program
 if __name__=="__main__":
     app=QApplication(sys.argv)
     Weather_App=WeatherApp()
